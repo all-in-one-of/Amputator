@@ -1,0 +1,44 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class CameraView : MonoBehaviour
+{
+    float scaleRot = 0.1f;
+    Vector3 lastMp;
+
+
+	void Start ()
+    {
+        lastMp = Input.mousePosition;
+    }
+	
+	void Update ()
+    {
+        //if (Camera.main.GetComponent<camScript>().mainMenu.GetComponent<PanelFades>().Visible() 
+        //    || camScript.folderWindow.GetComponent<PanelFades>().Visible() 
+        //    || camScript.sceneWindow.GetComponent<PanelFades>().Visible())
+        //{
+        //    lastMp = Input.mousePosition;
+        //    return;
+        //}
+        var mp = Input.mousePosition;
+        if (mp.x < 250)
+        {
+            lastMp = mp;
+            return;
+        }
+        var xFactor = (mp.x - lastMp.x) * scaleRot;
+        var yFactor = -(mp.y - lastMp.y) * scaleRot;
+
+        if (Input.GetMouseButton(0))
+        {
+            GameObject.Find("Camera Rig").transform.Rotate(transform.up, xFactor);
+            GameObject.Find("Camera Rig").transform.Rotate(transform.right, yFactor);
+        }
+        var zoom = Input.mouseScrollDelta.y * 0.3f;
+        var pos = GameObject.Find("Camera Rig").transform.localPosition;
+        pos.z += zoom; 
+        GameObject.Find("Camera Rig").transform.localPosition = pos;
+        lastMp = mp;
+    }
+}
