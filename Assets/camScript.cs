@@ -22,6 +22,7 @@ public class camScript : MonoBehaviour
     public static Vector3 Max = new Vector3(-1000, -1000, -1000);
     public static Parse_StlBinary parseStlBinary;
     public static List<Triangle> triangleList = new List<Triangle>();
+    public static List<Triangle> tempTriangleList = new List<Triangle>();
     public static List<Triangle> triangleListToDraw = new List<Triangle>();
     public Material Mat;
     public static Color stlColor = Color.white;
@@ -104,22 +105,24 @@ public class camScript : MonoBehaviour
                         tri.p2 -= c;
                         tri.p3 -= c;
                     }
-                    Redraw();
+                    Generate();
                 }
             }
             catch { }
             }
     }
 
+    public void Generate()
+    {
+        var splitter = new Splitter();
+    }
     public void Redraw()
     {
         MM.ClearAll();
         MM.Begin();
-        foreach (var tri in triangleList)
+        foreach (var tri in tempTriangleList)
         {
-            var sliceY = slicePlane.transform.position.y;
-            if (tri.p1.y > sliceY || tri.p2.y > sliceY || tri.p3.y > sliceY)
-                MM.AddTriangle(tri.p1, tri.p2, tri.p3, tri.norm, tri._binary);
+            MM.AddTriangle(tri.p1, tri.p2, tri.p3, tri.norm, tri._binary);
         }
         MM.MergeMesh();
     }

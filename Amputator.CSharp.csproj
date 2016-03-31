@@ -75,6 +75,7 @@
     <Compile Include="Assets\scripts\MakeMesh.cs" />
     <Compile Include="Assets\scripts\PanelFades.cs" />
     <Compile Include="Assets\scripts\Parse_StlBinary.cs" />
+    <Compile Include="Assets\scripts\Splitter.cs" />
     <Compile Include="Assets\scripts\StlInterpreter.cs" />
     <Compile Include="Assets\scripts\Triangle.cs" />
     <Compile Include="Assets\stopper.cs" />
