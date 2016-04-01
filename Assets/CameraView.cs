@@ -14,13 +14,12 @@ public class CameraView : MonoBehaviour
 	
 	void Update ()
     {
-        //if (Camera.main.GetComponent<camScript>().mainMenu.GetComponent<PanelFades>().Visible() 
-        //    || camScript.folderWindow.GetComponent<PanelFades>().Visible() 
-        //    || camScript.sceneWindow.GetComponent<PanelFades>().Visible())
-        //{
-        //    lastMp = Input.mousePosition;
-        //    return;
-        //}
+        var c = (camScript.tmpMin + camScript.tmpMax) / 2.0f;
+        if (GameObject.Find("Camera Rig").transform.position != c)
+        {
+            GameObject.Find("Camera Rig").transform.position = c;
+        }
+
         var mp = Input.mousePosition;
         if (mp.x < 250)
         {
@@ -32,13 +31,14 @@ public class CameraView : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            GameObject.Find("Camera Rig").transform.Rotate(transform.up, xFactor);
-            GameObject.Find("Camera Rig").transform.Rotate(transform.right, yFactor);
+
+            GameObject.Find("Camera Rig").transform.RotateAround(c, Camera.main.transform.up, xFactor);
+            GameObject.Find("Camera Rig").transform.RotateAround(c, Camera.main.transform.right, yFactor);
         }
-        var zoom = Input.mouseScrollDelta.y * 0.3f;
-        var pos = GameObject.Find("Camera Rig").transform.localPosition;
-        pos.z += zoom; 
-        GameObject.Find("Camera Rig").transform.localPosition = pos;
+        var zoom = Input.mouseScrollDelta.y * 0.5f;
+        var pos = Camera.main.transform.localPosition;
+        pos.z += zoom;
+        Camera.main.transform.localPosition = pos;
         lastMp = mp;
     }
 }

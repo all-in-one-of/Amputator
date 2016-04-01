@@ -28,6 +28,8 @@ public class camScript : MonoBehaviour
     public static Color stlColor = Color.white;
     public static float stlScale = 100;
     public GameObject slicePlane;
+    public static Vector3 tmpMin = Vector3.one * 10000;
+    public static Vector3 tmpMax = Vector3.one * -10000;
 
     void Start()
     {
@@ -69,6 +71,9 @@ public class camScript : MonoBehaviour
         {
             try
             {
+                triangleList.Clear();
+                tempTriangleList.Clear();
+                triangleListToDraw.Clear();
                 var fileName = openFileDialog.FileName;
                 stlInterpreter.ClearAll();
                 linesOfStl.Clear();
@@ -122,6 +127,9 @@ public class camScript : MonoBehaviour
         MM.Begin();
         foreach (var tri in tempTriangleList)
         {
+            TmpSetMaxMin(tri.p1);
+            TmpSetMaxMin(tri.p2);
+            TmpSetMaxMin(tri.p3);
             MM.AddTriangle(tri.p1, tri.p2, tri.p3, tri.norm, tri._binary);
         }
         MM.MergeMesh();
@@ -199,4 +207,27 @@ public class camScript : MonoBehaviour
         Min = min;
     }
 
+    public void TmpSetMaxMin(Vector3 vert)
+    {
+        var max = tmpMax;
+        var min = tmpMin;
+        if (vert.x > max.x) max.x = vert.x;
+        if (vert.x < min.x) min.x = vert.x;
+        if (vert.y > max.y) max.y = vert.y;
+        if (vert.y < min.y) min.y = vert.y;
+        if (vert.z > max.z) max.z = vert.z;
+        if (vert.z < min.z) min.z = vert.z;
+        tmpMax = max;
+        tmpMin = min;
+    }
+
+    public Vector3 tmpCentroid ()
+    {
+        return (tmpMax + tmpMin) / 2;
+    }
+
+    public void Save()
+    {
+        var saver = new Saver();
+    }
 }
