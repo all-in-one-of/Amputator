@@ -121,7 +121,6 @@ public class Parse_StlBinary
             sPos += 4;
 
             p[ii] = new Vector3(x, y, z);
-            p[ii] = p[ii];// / divisor;
         }
 
         var t = new Triangle(p[0], p[1], p[2], normal, true);

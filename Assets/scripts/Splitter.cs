@@ -4,9 +4,11 @@ using System.Collections.Generic;
 
 public class Splitter
 {
+    private float sliceHeight = 0;
+
     public Splitter()
     {
-        var y = Camera.main.GetComponent<camScript>().slicePlane.transform.position.y;
+        sliceHeight = Camera.main.GetComponent<camScript>().slicePlane.transform.position.y;
         var tris = camScript.triangleList;
         var gatherList = new List<Triangle>();
         foreach (var tri in tris)
@@ -21,26 +23,26 @@ public class Splitter
             var m_23 = Vector3.Normalize(p3 - p2);
             var m_31 = Vector3.Normalize(p1 - p3);
 
-            var n_12 = (y - p1.y) / m_12.y;
-            var n_23 = (y - p2.y) / m_23.y;
-            var n_31 = (y - p3.y) / m_31.y;
+            var n_12 = (sliceHeight - p1.y) / m_12.y;
+            var n_23 = (sliceHeight - p2.y) / m_23.y;
+            var n_31 = (sliceHeight - p3.y) / m_31.y;
 
-            if (p1.y < y && p2.y < y && p3.y < y) continue;        // All points below slice plane
-            if (p1.y > y && p2.y > y && p3.y > y)                // All points above slice plane
+            if (p1.y < sliceHeight && p2.y < sliceHeight && p3.y < sliceHeight) continue;        // All points below slice plane
+            if (p1.y > sliceHeight && p2.y > sliceHeight && p3.y > sliceHeight)                // All points above slice plane
             {
                 gatherList.Add(tri);
                 continue;
             }
-            if (p1.y > y)                                       // p1 visible
+            if (p1.y > sliceHeight)                                       // p1 visible
             {
-                if (p2.y < y && p3.y < y)                       //p2 and p3 are not visible. triangle
+                if (p2.y < sliceHeight && p3.y < sliceHeight)                       //p2 and p3 are not visible. triangle
                 {
                     p2 = p1 + n_12 * m_12;
                     p3 = p3 + n_31 * m_31;
                     var newTri = new Triangle(p1, p2, p3, norm, _binary);
                     gatherList.Add(newTri);
                 }
-                else if (p2.y < y)                              // Just p2 not visible. trapezoid
+                else if (p2.y < sliceHeight)                              // Just p2 not visible. trapezoid
                 {
                     var p12 = p1 + n_12 * m_12;
                     var p23 = p2 + n_23 * m_23;
@@ -49,7 +51,7 @@ public class Splitter
                     gatherList.Add(tri_1);
                     gatherList.Add(tri_2);
                 }
-                else if (p3.y < y)                              // Just p3 not visible. trapezoid
+                else if (p3.y < sliceHeight)                              // Just p3 not visible. trapezoid
                 {
                     var p23 = p2 + n_23 * m_23;
                     var p31 = p3 + n_31 * m_31;
@@ -60,10 +62,10 @@ public class Splitter
                 }
             }
 
-            else if (p2.y > y)                                       // p2 visible, p1 is not
+            else if (p2.y > sliceHeight)                                       // p2 visible, p1 is not
             {
 
-                if (p3.y > y)                              // p2 and p3 visible. p1 is not.
+                if (p3.y > sliceHeight)                              // p2 and p3 visible. p1 is not.
                 {
                     var p12 = p1 + n_12 * m_12;
                     var p31 = p3 + n_31 * m_31;
@@ -80,7 +82,7 @@ public class Splitter
                     gatherList.Add(newTri);
                 }
             }
-            else if (p3.y > y)                                       // p3 visible, p1 and p2 are not.
+            else if (p3.y > sliceHeight)                                       // p3 visible, p1 and p2 are not.
             {
                 var p23 = p2 + n_23 * m_23;
                 var p31 = p3 + n_31 * m_31;
@@ -96,11 +98,13 @@ public class Splitter
 
     public List<Triangle> CapIt(List<Triangle> gatherList)
     {
-        var y = Camera.main.GetComponent<camScript>().slicePlane.transform.position.y;
         var Max = Vector3.one * -100000;
         var Min = Vector3.one * 100000;
         var centr = Vector3.zero;
-        centr.y = y;
+        if (sliceHeight > -1000)
+        {
+            centr.y = sliceHeight;
+        }
         var capTris = new List<Triangle>();
         foreach (var tri in gatherList)
         {
@@ -110,16 +114,16 @@ public class Splitter
             var norm = Vector3.down;// tri.norm;    // all normals point straight down.
             var _binary = tri._binary;
 
-            if (p1.y != y && p2.y != y && p3.y != y) continue;
+            if (p1.y != sliceHeight && p2.y != sliceHeight && p3.y != sliceHeight) continue;
 
             #region diff
-            if (p1.y == y)                        // p1 on plane. p2 and p3 could be either.
+            if (p1.y == sliceHeight)                        // p1 on plane. p2 and p3 could be either.
             {
-                if (p2.y == y)                  // p1 and p2 on plane. p3 can not be on plane.
+                if (p2.y == sliceHeight)                  // p1 and p2 on plane. p3 can not be on plane.
                 {
                     capTris.Add(new Triangle(p2, p1, centr, norm, _binary));
                 }
-                else if (p3.y == y)             // p1 and p3 on plane. p2 can not be on plane.
+                else if (p3.y == sliceHeight)             // p1 and p3 on plane. p2 can not be on plane.
                 {
                     capTris.Add(new Triangle(p1, p3, centr, norm, _binary));
                 }
@@ -129,9 +133,9 @@ public class Splitter
                 }
 
             }
-            else if (p2.y == y)                 // p2 on plane. p1 is not. p3 could be either.
+            else if (p2.y == sliceHeight)                 // p2 on plane. p1 is not. p3 could be either.
             {
-                if (p3.y == y)                   // p2 and p3 on plane. p1 is not.
+                if (p3.y == sliceHeight)                   // p2 and p3 on plane. p1 is not.
                 {
                     capTris.Add(new Triangle(p3, p2, centr, norm, _binary));
                 }
@@ -147,8 +151,10 @@ public class Splitter
             }
             #endregion
         }
-        Max.y = y;
-        Min.y = y;
+        if (sliceHeight > -1000)
+        {
+            Min.y = sliceHeight;
+        }
         foreach (var capTri in capTris)
         {
             if (capTri.p1.x > Max.x) Max.x = capTri.p1.x;
@@ -160,9 +166,10 @@ public class Splitter
             if (capTri.p2.z > Max.z) Max.z = capTri.p2.z;
             if (capTri.p2.x < Min.x) Min.x = capTri.p2.x;
             if (capTri.p2.z < Min.z) Min.z = capTri.p2.z;
+            
         }
         centr = (Max + Min) / 2;
-        centr.y = y;// - 0.5f;
+        centr.y = sliceHeight;
         foreach (var capTri in capTris)
         {
             capTri.p3 = centr;
