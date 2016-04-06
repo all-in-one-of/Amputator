@@ -16,7 +16,7 @@ public class Saver
         {
             StreamWriter w = File.CreateText(saveD.FileName);
             w.WriteLine(saveD.FileName);
-            foreach (var t in camScript.tempTriangleList)
+            foreach (var t in camScript.tempTriangleListBone)
             {
                 var s = camScript.stlScale;
                 var p1 = t.p1 / s;

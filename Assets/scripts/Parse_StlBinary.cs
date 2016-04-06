@@ -7,17 +7,15 @@ using System.Linq;
 
 public class Parse_StlBinary
 {
-    private MakeMesh mm;
     private int num_facets = 0;
     private float divisor = 10000;
 
-    public Parse_StlBinary (string path, MakeMesh _mm, byte[] bytes)
+    public Parse_StlBinary (string path, byte[] bytes, bool _isBone)
     {
-        mm = _mm;
-        Read_Text(path, bytes);
+        Read_Text(path, bytes, _isBone);
     }
 
-    void Read_Text(string _path, byte[] _bytes)
+    void Read_Text(string _path, byte[] _bytes, bool _isBone)
     {
         var l = new List<byte>();
         if (_path == "")
@@ -41,12 +39,11 @@ public class Parse_StlBinary
             numFacetBytes[i - 80] = l[i];
         }
         num_facets = BitConverter.ToInt32(numFacetBytes, 0);
-        GenerateMesh(l);
+        GenerateMesh(l, _isBone);
     }
 
-    public void GenerateMesh (List<byte> l)
+    public void GenerateMesh (List<byte> l, bool _isBone)
     {
-        mm.Begin();
         var sPos = 84;
         var chunk = new List<byte>();
         for (int facet = 0; facet < num_facets; facet++)
@@ -59,16 +56,15 @@ public class Parse_StlBinary
                     chunk.Add(l[vector3]);
                 }//Makes chunk of 50
                 var triangle = chunk.ToArray();
-                Parse_Vertices(triangle);
+                Parse_Vertices(triangle, _isBone);
                 sPos += 50;
             }
         }
-        mm.MergeMesh();
+        Camera.main.GetComponent<camScript>().Generate(_isBone);
     }
 
-    public void Parse_Vertices(byte[] triangle)
+    public void Parse_Vertices(byte[] triangle, bool _isBone)
     {
-        //MonoBehaviour.print(readBytes.Length.ToString());
         var sPos = 0;
         var chunk = new byte[4];
 
@@ -124,10 +120,19 @@ public class Parse_StlBinary
         }
 
         var t = new Triangle(p[0], p[1], p[2], normal, true);
-        camScript.triangleList.Add(t);
-        Camera.main.GetComponent<camScript>().SetMaxMin(p[0]);
-        Camera.main.GetComponent<camScript>().SetMaxMin(p[1]);
-        Camera.main.GetComponent<camScript>().SetMaxMin(p[2]);
-        //mm.AddTriangle(p[0], p[1], p[2], normal, true);
+        if (_isBone)
+        {
+            camScript.triangleListBone.Add(t);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[0], false, _isBone);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[1], false, _isBone);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[2], false, _isBone);
+        }
+        else
+        {
+            camScript.triangleListSocket.Add(t);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[0], false, _isBone);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[1], false, _isBone);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[2], false, _isBone);
+        }
     }
 }

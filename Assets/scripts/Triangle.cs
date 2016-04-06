@@ -16,4 +16,10 @@ public class Triangle
     public Vector3 p3 { get; set; }
     public Vector3 norm { get; set; }
     public bool _binary { get; set; }
+
+    public void GenerateNormal ()
+    {
+        var dir = Vector3.Cross(p2 - p1, p3 - p1);
+        norm = Vector3.Normalize(dir);
+    }
 }

@@ -61,17 +61,15 @@
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="System.Drawing">
-      <HintPath>Assets\Plugins\System.Drawing.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Forms">
       <HintPath>Assets\Plugins\System.Windows.Forms.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\CameraView.cs" />
-    <Compile Include="Assets\ScrollSpeed.cs" />
     <Compile Include="Assets\scripts\MakeMesh.cs" />
+    <Compile Include="Assets\scripts\MeshSimplifier.cs" />
+    <Compile Include="Assets\scripts\MeshSimplifier_old.cs" />
     <Compile Include="Assets\scripts\ObjInterpreter.cs" />
     <Compile Include="Assets\scripts\Parse_StlBinary.cs" />
     <Compile Include="Assets\scripts\Saver.cs" />
@@ -80,12 +78,8 @@
     <Compile Include="Assets\scripts\Splitter.cs" />
     <Compile Include="Assets\scripts\StlInterpreter.cs" />
     <Compile Include="Assets\scripts\Triangle.cs" />
+    <Compile Include="Assets\scripts\VertexToSimplify.cs" />
     <Compile Include="Assets\scripts\camScript.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Plugins\donotdelete.txt" />
-    <None Include="Assets\Plugins\x86\donotdelete.txt" />
-    <None Include="Assets\Plugins\x86_64\donotdelete.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

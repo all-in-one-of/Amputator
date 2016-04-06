@@ -6,28 +6,46 @@ public class StlInterpreter
     private Vector3 Normal;
     public Vector3 Min { get; set; }
     public Vector3 Max { get; set; }
+    bool isBone;
 
     public void ClearAll()
     {
         camScript.currentVertices.Clear();
-        camScript.MM.ClearAll();
+        if (isBone)
+        {
+            foreach (var m in camScript.BoneMeshes)
+            {
+                MonoBehaviour.Destroy(m.gameObject);
+            }
+            camScript.BoneMeshes.Clear();
+        }
+        else
+        {
+            foreach (var m in camScript.SocketMeshes)
+            {
+                MonoBehaviour.Destroy(m.gameObject);
+            }
+            camScript.SocketMeshes.Clear();
+        }
+
+
         Min = Vector3.one * 1000;
         Max = Vector3.one * -1000;
     }
     public Vector3 centroid
     {
         get
-        {
-            
+        {            
             var c = (Min + Max) / 2.0f;
             return c;
         }
     }
 
-    public StlInterpreter()
+    public StlInterpreter(bool _isBone)
     {
         Min = Vector3.one * 1000;
         Max = Vector3.one * -1000;
+        isBone = _isBone;
     }
 
     public void normal (string _line)
@@ -75,14 +93,16 @@ public class StlInterpreter
 	{
 		try
 		{
-            var mm = camScript.MM;
             var p = camScript.currentVertices;
             //mm.AddTriangle(p[0], p[1], p[2], Normal, false);
             var t = new Triangle(p[0], p[1], p[2], Normal, false);
-            camScript.triangleList.Add(t);
-            Camera.main.GetComponent<camScript>().SetMaxMin(p[0]);
-            Camera.main.GetComponent<camScript>().SetMaxMin(p[1]);
-            Camera.main.GetComponent<camScript>().SetMaxMin(p[2]);
+            if (isBone)
+                camScript.triangleListBone.Add(t);
+            else
+                camScript.triangleListSocket.Add(t);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[0], false, isBone);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[1], false, isBone);
+            Camera.main.GetComponent<camScript>().SetMaxMin(p[2], false, isBone);
             camScript.currentVertices.Clear ();
 		}
 		catch{}
@@ -124,18 +144,7 @@ public class StlInterpreter
 					z *= (Mathf.Pow (10f, zE));
 			}
 			var newVertex = new Vector3 (x,y,z) * camScript.stlScale;
-            var max = Max;
-            var min = Min;
-            if (x > Max.x) max.x = x;
-            if (x < Min.x) min.x = x;
-            if (y > Max.y) max.y = y;
-            if (y < Min.y) min.y = y;
-            if (z > Max.z) max.z = z;
-            if (z < Min.z) min.z = z;
-            Max = max;
-            Min = min;
-            if (min.z <= camScript.Min.z)
-                camScript.Min.z = min.z;
+            Camera.main.GetComponent<camScript>().SetMaxMin(newVertex, false, isBone);
 
             camScript.currentVertices.Add (newVertex);
 		}

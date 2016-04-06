@@ -6,10 +6,18 @@ public class Splitter
 {
     private float sliceHeight = 0;
 
-    public Splitter()
+    public Splitter(bool _isBone)
     {
         sliceHeight = Camera.main.GetComponent<camScript>().slicePlane.transform.position.y;
-        var tris = camScript.triangleList;
+        var tris = new List<Triangle>();
+        if (_isBone)
+            tris = camScript.triangleListBone;
+        else
+        {
+            camScript.tempTriangleListSocket = camScript.triangleListSocket;
+            Camera.main.GetComponent<camScript>().Redraw(_isBone);
+            return;
+        }
         var gatherList = new List<Triangle>();
         foreach (var tri in tris)
         {
@@ -90,10 +98,10 @@ public class Splitter
                 gatherList.Add(newTri);
             }
         }
-        camScript.tempTriangleList.Clear();
-        camScript.tempTriangleList = gatherList;
-        camScript.tempTriangleList.AddRange(CapIt(gatherList));
-        Camera.main.GetComponent<camScript>().Redraw();
+        camScript.tempTriangleListBone.Clear();
+        camScript.tempTriangleListBone = gatherList;
+        camScript.tempTriangleListBone.AddRange(CapIt(gatherList));
+        Camera.main.GetComponent<camScript>().Redraw(_isBone);
     }
 
     public List<Triangle> CapIt(List<Triangle> gatherList)

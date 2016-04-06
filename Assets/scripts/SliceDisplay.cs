@@ -27,7 +27,7 @@ public class SliceDisplay : MonoBehaviour {
     {
         lines.Clear();
         var y = Camera.main.GetComponent<camScript>().slicePlane.transform.position.y;
-        foreach (var tri in camScript.triangleList)
+        foreach (var tri in camScript.triangleListBone)
         {
             var p1 = tri.p1;
             var p2 = tri.p2;

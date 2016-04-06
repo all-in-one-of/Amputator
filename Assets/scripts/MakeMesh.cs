@@ -21,7 +21,8 @@ public class MakeMesh : MonoBehaviour
     public void ClearAll()
     {
         GO = false;
-        mesh.Clear();
+        if (mesh != null)
+            mesh.Clear();
 
         tris.Clear();
         verts.Clear();
@@ -29,14 +30,14 @@ public class MakeMesh : MonoBehaviour
         colors.Clear();
         uvs.Clear();
         d = 0;
-        camScript.Min = Vector3.one * 1000;
-        camScript.Max = Vector3.one * -1000;
     }
     public void Begin()
     {
         gameObject.transform.position = Vector3.zero;
-        camScript.Min = Vector3.one * 1000;
-        camScript.Max = Vector3.one * -1000;
+        camScript.MinBone = Vector3.one * 1000;
+        camScript.MaxBone = Vector3.one * -1000;
+        camScript.MinSocket = Vector3.one * 1000;
+        camScript.MaxSocket = Vector3.one * -1000;
         if (gameObject.GetComponent<MeshFilter>() == null)
             gameObject.AddComponent<MeshFilter>();
         if (gameObject.GetComponent<MeshRenderer>() == null)

@@ -14,7 +14,7 @@ public class CameraView : MonoBehaviour
 	
 	void Update ()
     {
-        var c = (camScript.tmpMin + camScript.tmpMax) / 2.0f;
+        var c = (camScript.tmpMinBone + camScript.tmpMaxBone) / 2.0f;
         if (GameObject.Find("Camera Rig").transform.position != c)
         {
             GameObject.Find("Camera Rig").transform.position = c;

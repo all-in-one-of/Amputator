@@ -10,11 +10,11 @@ public class ObjInterpreter
     List<Vector3> norms = new List<Vector3>();
     List<Vector3> uvs = new List<Vector3>();
     List<Vector3> indices = new List<Vector3>();
-    float objScale = 0.01f;
+    float objScale = 1f;
     int _tCount = 0;
     int _vCount = 0;
 
-    public ObjInterpreter(string _filename)
+    public ObjInterpreter(string _filename, bool _isBone)
     {
         var reader = new StreamReader(_filename);
         while (!reader.EndOfStream)
@@ -25,7 +25,7 @@ public class ObjInterpreter
             string[] lines = s.Split("\n"[0]);
             foreach (string item in lines)
             {
-                ReadLine(item);
+                ReadLine(item, _isBone);
             }
         }
 
@@ -38,21 +38,37 @@ public class ObjInterpreter
             var p1 = verts[_p1];
             var p2 = verts[_p2];
             var p3 = verts[_p3];
-            var n = norms[_p1];
+            var n = Normal(p1, p2, p3);
+            if (norms.Count > _p1)
+            {
+                n = norms[_p1];
+            }
             var t = new Triangle(p1, p2, p3, n, false);
-            camScript.triangleList.Add(t);
+            if (_isBone)
+                camScript.triangleListBone.Add(t);
+            else
+                camScript.triangleListSocket.Add(t);
         }
-        var c = (camScript.Min + camScript.Max) / 2.0f;
-        //foreach (var tri in camScript.triangleList)
+        var c = (camScript.MinSocket + camScript.MaxSocket) / 2.0f;
+        if (_isBone)
+            c = (camScript.MinBone + camScript.MaxBone) / 2.0f;
+        //foreach (var tri in camScript.triangleListBone)
         //{            
         //    tri.p1 -= c;
         //    tri.p2 -= c;
         //    tri.p3 -= c;
         //}
-        Camera.main.GetComponent<camScript>().Generate();
+        Camera.main.GetComponent<camScript>().Generate(_isBone);
     }
 
-    public void ReadLine(string s)
+    public Vector3 Normal(Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        var dir = Vector3.Cross(p2 - p1, p3 - p1);
+        var norm = Vector3.Normalize(dir);
+        return norm;
+    }
+
+    public void ReadLine(string s, bool _isBone)
     {
         //remove any trailing white-space chararcters to ensure that there will be no empty splits
         char[] charsToTrim = { ' ', '\n', '\t', '\r' };
@@ -65,14 +81,14 @@ public class ObjInterpreter
         //assemble all vertices, normals and uv-coordinates
         if (words[0] == "v")
         {
-            verts.Add(getVector(words[1], words[2], words[3]));
-            uvs.Add(getVector(words[1], words[2], words[3]));
+            verts.Add(getVector(words[1], words[2], words[3], _isBone));
+            uvs.Add(getVector(words[1], words[2], words[3], _isBone));
             _vCount++;
         }
 
         if (words[0] == "vn")
         {
-            norms.Add(getVector(words[1], words[2], words[3]));
+            norms.Add(getVector(words[1], words[2], words[3], _isBone));
         }
         if (words[0] == "vt")
         {
@@ -95,7 +111,7 @@ public class ObjInterpreter
         }
     }
 
-    public Vector3 getVector(string xString, string yString, string zString)
+    public Vector3 getVector(string xString, string yString, string zString, bool _isBone)
     {
         {
             float x;
@@ -125,16 +141,7 @@ public class ObjInterpreter
                     z *= (Mathf.Pow(10f, zE));
             }
             var newVertex = new Vector3(x, y, z) * objScale;
-            var max = camScript.Max;
-            var min = camScript.Min;
-            if (x > max.x) max.x = x;
-            if (x < min.x) min.x = x;
-            if (y > max.y) max.y = y;
-            if (y < min.y) min.y = y;
-            if (z > max.z) max.z = z;
-            if (z < min.z) min.z = z;
-            camScript.Max = max;
-            camScript.Min = min;
+            Camera.main.GetComponent<camScript>().SetMaxMin(newVertex, false, _isBone);
 
             return newVertex;
         }
