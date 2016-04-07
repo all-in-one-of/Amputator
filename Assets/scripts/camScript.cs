@@ -14,6 +14,7 @@ public class camScript : MonoBehaviour
     public Slider move_plane;
     public Dropdown limb_select;
     public Toggle slicerToggle;
+    public UnityEngine.UI.Button sliceButton;
     public MakeMesh MM;
     public Transform boneHolder;
     public Transform socketHolder;
@@ -69,6 +70,16 @@ public class camScript : MonoBehaviour
     public void ToggleSlicer()
     {
         slice =  slicerToggle.isOn;
+        if (slice)
+        {
+            move_plane.interactable = true;
+            sliceButton.interactable = true;
+        }
+        else
+        {
+            move_plane.interactable = false;
+            sliceButton.interactable = false;
+        }
     }
     public void loadFile(bool _isBone)
     {
