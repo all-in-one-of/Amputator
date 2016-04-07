@@ -51,13 +51,25 @@ public class ObjInterpreter
         }
         var c = (camScript.MinSocket + camScript.MaxSocket) / 2.0f;
         if (_isBone)
+        {
             c = (camScript.MinBone + camScript.MaxBone) / 2.0f;
-        //foreach (var tri in camScript.triangleListBone)
-        //{            
-        //    tri.p1 -= c;
-        //    tri.p2 -= c;
-        //    tri.p3 -= c;
-        //}
+            foreach (var tri in camScript.triangleListBone)
+            {
+                tri.p1 -= c;
+                tri.p2 -= c;
+                tri.p3 -= c;
+            }
+        }
+        else
+        {
+            c = (camScript.MinSocket + camScript.MaxSocket) / 2.0f;
+            foreach (var tri in camScript.triangleListSocket)
+            {
+                tri.p1 -= c;
+                tri.p2 -= c;
+                tri.p3 -= c;
+            }
+        }
         Camera.main.GetComponent<camScript>().Generate(_isBone);
     }
 

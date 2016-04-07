@@ -13,7 +13,7 @@ public class MeshSimplifier_old
             tris = camScript.triangleListBone;
         else
             tris = camScript.triangleListSocket;
-        precision = Camera.main.GetComponent<camScript>().Precision;
+        //precision = Camera.main.GetComponent<camScript>().Precision;
         var verts = new List<VertexToSimplify>();
         foreach (var tri in tris)
         {

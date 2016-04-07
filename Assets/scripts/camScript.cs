@@ -21,7 +21,8 @@ public class camScript : MonoBehaviour
     public Material BoneMat;
     public Material SocketMat;
     public MeshSimplifier simplifier;
-    public float Precision;
+    public float MinTriangleSize;
+    public bool simplify = false;
     public static List<MakeMesh> BoneMeshes = new List<MakeMesh>();
     public static List<MakeMesh> SocketMeshes = new List<MakeMesh>();
     public static List<Triangle> triangleListBone = new List<Triangle>();
@@ -168,12 +169,14 @@ public class camScript : MonoBehaviour
 
     public void Generate(bool _isBone)
     {
-        var simplifier = new MeshSimplifier(_isBone);
+        if (simplify)
+            new MeshSimplifier(_isBone);
         var splitter = new Splitter(_isBone);
     }
     public void Redraw(bool _isBone)
     {
         var fullTempTriList = new List<Triangle>();
+        print("Polys: " + triangleListBone.Count.ToString());
         if (_isBone)
         {
             foreach (var m in BoneMeshes)
